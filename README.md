@@ -55,7 +55,7 @@ Key insights discovered:
 
 Try the interactive dashboard online (no installation needed):
 
-🔗 [Customer_Lifetime_Value_Analysis Dashboard](https://customer-lifetime-value-analysis.streamlit.app)
+🔗 [Customer Lifetime Value Analysis Dashboard](https://customer-lifetime-value-analysis.streamlit.app)
 
 ---
 
