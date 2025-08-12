@@ -5,47 +5,34 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import linregress
 
-# Page config & global style dark mode
+# Page config
 st.set_page_config(
     page_title="CUSTOMER INSIGHTS : LIFETIME VALUE PREDICTION FOR RIDE-HAILING",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# === Dark Theme Style ===
 st.markdown("""
 <style>
-    /* Background & font */
     body, .block-container {
         background-color: #121212 !important;
         color: #f0f0f0 !important;
     }
-    /* Title color */
-    .css-18e3th9 {
-        color: #00aaff !important;
-        font-weight: 700 !important;
-    }
-    /* Headers */
-    h2, h3, h4, h5 {
-        color: #00aaff !important;
-        font-weight: 600 !important;
-    }
-    /* Table headers */
-    thead tr th {
-        color: #00aaff !important;
-    }
-    /* Streamlit button */
+    .css-18e3th9 { color: #00aaff !important; font-weight: 700 !important; }
+    h2, h3, h4, h5 { color: #00aaff !important; font-weight: 600 !important; }
+    thead tr th { color: #00aaff !important; }
     .stButton>button {
         background: linear-gradient(90deg, #003366, #3399ff) !important;
         color: white !important;
         font-weight: 700 !important;
         border-radius: 4px !important;
     }
-    /* Seaborn grid lines */
-    .grid line {
-        stroke: #222 !important;
-    }
 </style>
 """, unsafe_allow_html=True)
+
+# Set matplotlib dark theme
+plt.style.use("dark_background")
 
 st.title("CUSTOMER INSIGHTS : LIFETIME VALUE PREDICTION FOR RIDE-HAILING")
 st.markdown("---")
@@ -81,7 +68,7 @@ if st.sidebar.checkbox("Show raw data"):
     st.subheader("Raw Dataset")
     st.dataframe(df)
 
-# Missing values summary
+# Missing Values Summary
 st.subheader("Missing Values Summary")
 missing_count = df.isnull().sum()
 missing_only = missing_count[missing_count > 0]
@@ -97,48 +84,43 @@ if not missing_only.empty:
 else:
     st.markdown("No missing values detected after imputation.")
 
-# Correlation heatmap
+# Heatmap
 st.subheader("Feature Correlation Heatmap")
 cols = ['Trip_Distance', 'Customer_Since_Months', 'Life_Style_Index', 'Customer_Rating',
         'Cancellation_Last_1Month', 'Var1', 'Var2', 'Var3', 'Surge_Pricing_Type']
 corr_df = df[cols].corr()
+
 fig, ax = plt.subplots(figsize=(12, 6))
-sns.heatmap(
-    corr_df,
-    annot=True,
-    fmt=".2f",
-    cmap=sns.light_palette("navy", as_cmap=True),
-    linewidths=0.5,
-    ax=ax
-)
+sns.heatmap(corr_df, annot=True, fmt=".2f", cmap="Blues", linewidths=0.5, ax=ax)
 ax.set_title("Correlation Heatmap Between Main Features and Target", color="white")
 ax.tick_params(colors='white')
-plt.yticks(rotation=0)
-plt.xticks(rotation=45)
+plt.yticks(rotation=0, color='white')
+plt.xticks(rotation=45, color='white')
 st.pyplot(fig)
 
+# Correlation with target
 st.markdown("**Correlation with Surge Pricing Type:**")
 target_corr = corr_df['Surge_Pricing_Type'].drop('Surge_Pricing_Type').sort_values(ascending=False)
 st.write(target_corr)
 
-# Cancellation rate barplot
+# Barplot: Cancellation Rate
 st.subheader("Average Cancellation Rate per Surge Pricing Type")
-fig2, ax2 = plt.subplots(figsize=(8,5))
+fig2, ax2 = plt.subplots(figsize=(8, 5))
 sns.barplot(
     x='Surge_Pricing_Type',
     y='Cancellation_Last_1Month',
     data=df,
     estimator=np.mean,
-    palette=sns.light_palette("navy", reverse=True),
+    palette="Blues",
     ax=ax2
 )
-ax2.set_ylabel("Average Cancellation Rate", color='white')
-ax2.set_xlabel("Surge Pricing Type", color='white')
 ax2.set_title("Cancellation Rate per Surge Pricing Type", color='white')
+ax2.set_xlabel("Surge Pricing Type", color='white')
+ax2.set_ylabel("Average Cancellation Rate", color='white')
 ax2.tick_params(colors='white')
 st.pyplot(fig2)
 
-# Custom scatterplot function
+# Scatterplot with regression
 def custom_scatterplot_with_trend(df, x_col, y_col, sample_size=3000, alpha=0.7):
     sample_df = df[[x_col, y_col]].dropna()
     if len(sample_df) > sample_size:
@@ -147,12 +129,12 @@ def custom_scatterplot_with_trend(df, x_col, y_col, sample_size=3000, alpha=0.7)
     correlation = sample_df[x_col].corr(sample_df[y_col])
     slope, intercept, r_value, p_value, std_err = linregress(sample_df[x_col], sample_df[y_col])
 
-    plt.figure(figsize=(10, 5))
-    scatter = plt.scatter(
+    fig, ax = plt.subplots(figsize=(10, 5))
+    scatter = ax.scatter(
         sample_df[x_col],
         sample_df[y_col],
         c=sample_df[y_col],
-        cmap=sns.light_palette("navy", as_cmap=True),
+        cmap="Blues",
         alpha=alpha,
         edgecolor='k',
         linewidth=0.3
@@ -164,13 +146,14 @@ def custom_scatterplot_with_trend(df, x_col, y_col, sample_size=3000, alpha=0.7)
         y=y_col,
         scatter=False,
         color='white',
-        line_kws={'linewidth': 2, 'linestyle': '--'}
+        line_kws={'linewidth': 2, 'linestyle': '--'},
+        ax=ax
     )
-    plt.grid(True, linestyle='--', alpha=0.5)
-    plt.xlabel(x_col, color='white')
-    plt.ylabel(y_col, color='white')
-    plt.title(f'Scatterplot of {x_col} vs {y_col}\nCorrelation={correlation:.2f}, Slope={slope:.2f}', color='white')
-    st.pyplot(plt.gcf())
+    ax.set_xlabel(x_col, color='white')
+    ax.set_ylabel(y_col, color='white')
+    ax.set_title(f'Scatterplot of {x_col} vs {y_col}\nCorrelation={correlation:.2f}, Slope={slope:.2f}', color='white')
+    ax.tick_params(colors='white')
+    st.pyplot(fig)
 
     stats_df = pd.DataFrame({
         'Correlation': [correlation],
@@ -185,14 +168,14 @@ def custom_scatterplot_with_trend(df, x_col, y_col, sample_size=3000, alpha=0.7)
 st.subheader("Trip Distance vs Customer Rating")
 custom_scatterplot_with_trend(df, 'Trip_Distance', 'Customer_Rating')
 
-# Boxplot customer rating per surge type
+# Boxplot: Customer Rating vs Surge Type
 st.subheader("Customer Rating Distribution by Surge Pricing Type")
 fig3, ax3 = plt.subplots(figsize=(12, 5))
 sns.boxplot(
     x='Surge_Pricing_Type',
     y='Customer_Rating',
     data=df,
-    palette=sns.light_palette("navy", reverse=True),
+    palette="Blues",
     ax=ax3
 )
 ax3.set_title("Customer Rating Distribution by Surge Pricing Type", color='white')
@@ -201,12 +184,13 @@ ax3.set_ylabel("Customer Rating", color='white')
 ax3.tick_params(colors='white')
 st.pyplot(fig3)
 
+# Rating Summary
 st.markdown("### Customer Rating Statistics by Surge Pricing Type")
 desc_stats = df.groupby('Surge_Pricing_Type')['Customer_Rating'].describe()
 desc_stats['mean'] = df.groupby('Surge_Pricing_Type')['Customer_Rating'].mean()
 st.dataframe(desc_stats.style.format("{:.2f}"))
 
-# Business Recommendations
+# Final Note
 st.markdown("---")
 st.header("Business Recommendations")
 st.markdown("""
@@ -215,6 +199,5 @@ st.markdown("""
 - **Reward Long-Term Customers:** Offer special incentives to retain loyal customers who tolerate surge pricing.  
 - **Personalize Offers Based on Trip Behavior:** Tailor promotions and packages for customers with long-distance trips and high CLV.
 """)
-
 st.markdown("---")
 st.markdown("Personal project by Ida Hayyu")
