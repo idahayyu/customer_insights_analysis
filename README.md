@@ -1,4 +1,4 @@
-# CUSTOMER INSIGHTS: LIFETIME VALUE PREDICTION FOR RIDE-HAILING
+# CUSTOMER LIFETIME VALUE ANALYSIS: FOR RIDE-HAILING SERVICES
 
 ## Project Overview
 This project analyzes Sigma Cabs customer and trip data to uncover the key drivers of **Customer Lifetime Value (CLV)**. The ultimate goal is to provide actionable, data-driven business recommendations to increase customer retention and profitability.
