@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv/
+env/
+venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VS Code settings folder
+.vscode/
+
+# MacOS files
+.DS_Store
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# Streamlit cache and temp files
+.streamlit/
+
+# Data files (VERY IMPORTANT to ignore sensitive/big data)
+*.csv
+*.xlsx
+*.xls
+*.json
+*.parquet
+
+# Secrets and config files
+*.env
+config.yaml
+credentials.json
+secrets.toml
